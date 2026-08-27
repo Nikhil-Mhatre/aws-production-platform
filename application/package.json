@@ -1,0 +1,32 @@
+{
+  "name": "launchpad-api",
+  "version": "0.1.0",
+  "description": "LaunchPad API - a simple Node.js/Express workload for the AWS Production Platform portfolio project.",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.3.0",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.1",
+    "globals": "^17.11.0",
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
+  }
+}
