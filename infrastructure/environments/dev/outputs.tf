@@ -27,3 +27,18 @@ output "nat_gateway_ids" {
   description = "Development NAT Gateway IDs, if enabled."
   value       = module.vpc.nat_gateway_ids
 }
+
+output "alb_security_group_id" {
+  description = "Security group ID for the Application Load Balancer"
+  value       = module.security_groups.alb_security_group_id
+}
+
+output "ecs_security_group_id" {
+  description = "Security group ID for ECS Fargate tasks"
+  value       = module.security_groups.ecs_security_group_id
+}
+
+output "rds_security_group_id" {
+  description = "Security group ID for RDS PostgreSQL"
+  value       = module.security_groups.rds_security_group_id
+}
