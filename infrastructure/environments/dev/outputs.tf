@@ -62,3 +62,33 @@ output "ecs_task_role_arn" {
   description = "ECS task role ARN"
   value       = module.iam.ecs_task_role_arn
 }
+
+output "vpc_endpoint_security_group_id" {
+  description = "Security group ID for VPC interface endpoints"
+  value       = module.vpc_endpoints.endpoint_security_group_id
+}
+
+output "ecr_api_endpoint_id" {
+  description = "ECR API VPC endpoint ID"
+  value       = module.vpc_endpoints.ecr_api_endpoint_id
+}
+
+output "ecr_dkr_endpoint_id" {
+  description = "ECR Docker Registry VPC endpoint ID"
+  value       = module.vpc_endpoints.ecr_dkr_endpoint_id
+}
+
+output "s3_endpoint_id" {
+  description = "S3 gateway VPC endpoint ID"
+  value       = module.vpc_endpoints.s3_endpoint_id
+}
+
+output "cloudwatch_logs_endpoint_id" {
+  description = "CloudWatch Logs VPC endpoint ID"
+  value       = module.vpc_endpoints.logs_endpoint_id
+}
+
+output "secrets_manager_endpoint_id" {
+  description = "Secrets Manager VPC endpoint ID"
+  value       = module.vpc_endpoints.secrets_manager_endpoint_id
+}

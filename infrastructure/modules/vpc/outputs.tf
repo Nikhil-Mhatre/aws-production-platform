@@ -54,3 +54,10 @@ output "nat_gateway_ids" {
   # If the user sets 'enable_nat_gateway = false' in variables, Terraform won't create any,
   # and this output will gracefully return an empty list[cite: 2].
 }
+
+# ==============================================================================
+# ROUTE OUTPUTS
+# ==============================================================================
+output "private_app_route_table_ids" {
+  value = aws_route_table.private_app[*].id
+}

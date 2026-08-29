@@ -282,3 +282,50 @@ module "iam" {
   # this specific ECR repository instead of granting unrestricted ECR access.
   ecr_repository_arn = module.ecr.repository_arn
 }
+
+
+# ==============================================================================
+# VPC ENDPOINTS MODULE
+# ==============================================================================
+# Provides private connectivity from ECS/private application subnets to
+# selected AWS services.
+#
+# Interface endpoints:
+#   ECR API
+#   ECR Docker Registry
+#   CloudWatch Logs
+#   Secrets Manager
+#
+# Gateway endpoint:
+#   S3
+#
+# AWS-service traffic can therefore avoid the NAT Gateway where supported,
+# while general external internet traffic continues to use NAT.
+# ==============================================================================
+
+module "vpc_endpoints" {
+  source = "../../modules/vpc-endpoints"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  # VPC created by the VPC module.
+  vpc_id = module.vpc.vpc_id
+
+  # Interface endpoints are placed in the private application subnets
+  # where ECS Fargate tasks will run.
+  private_app_subnet_ids = module.vpc.private_app_subnet_ids
+
+  # The S3 gateway endpoint is associated with these route tables.
+  private_app_route_table_ids = module.vpc.private_app_route_table_ids
+
+  # Only ECS tasks are allowed to connect to the interface endpoints.
+  ecs_security_group_id = module.security_groups.ecs_security_group_id
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
