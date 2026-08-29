@@ -42,3 +42,23 @@ output "rds_security_group_id" {
   description = "Security group ID for RDS PostgreSQL"
   value       = module.security_groups.rds_security_group_id
 }
+
+output "ecr_repository_name" {
+  description = "ECR repository name"
+  value       = module.ecr.repository_name
+}
+
+output "ecr_repository_url" {
+  description = "ECR repository URL"
+  value       = module.ecr.repository_url
+}
+
+output "ecs_execution_role_arn" {
+  description = "ECS task execution role ARN"
+  value       = module.iam.ecs_execution_role_arn
+}
+
+output "ecs_task_role_arn" {
+  description = "ECS task role ARN"
+  value       = module.iam.ecs_task_role_arn
+}
