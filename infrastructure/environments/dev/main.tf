@@ -284,6 +284,10 @@ module "iam" {
 
   # Restrict CloudWatch Logs access to this project's ECS log group.
   cloudwatch_log_group_arn = module.cloudwatch.log_group_arn
+
+  # Restrict Secrets Manager access to the database secret created and
+  # managed by RDS.
+  database_secret_arn = module.rds.master_user_secret_arn
 }
 
 
@@ -349,6 +353,151 @@ module "cloudwatch" {
   project_name       = var.project_name
   environment        = var.environment
   log_retention_days = var.log_retention_days
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+# ==============================================================================
+# RDS POSTGRESQL MODULE
+# ==============================================================================
+# Creates the private PostgreSQL database used by LaunchPad API.
+#
+# RDS is placed in the private database subnets and is protected by the RDS
+# security group.
+#
+# ECS will later connect to RDS over TCP/5432.
+# ==============================================================================
+
+module "rds" {
+  source = "../../modules/rds"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  # PostgreSQL configuration.
+  engine_version = "16"
+  instance_class = "db.t4g.micro"
+
+  database_name   = "launchpad"
+  master_username = "launchpad_admin"
+
+  # Keep the development database small.
+  allocated_storage     = 20
+  max_allocated_storage = 100
+
+  # RDS is placed only in private database subnets.
+  private_db_subnet_ids = module.vpc.private_db_subnet_ids
+
+  # Only ECS is allowed to connect to PostgreSQL through the RDS security
+  # group configured earlier.
+  rds_security_group_id = module.security_groups.rds_security_group_id
+
+  # Keep seven days of automated backups for development.
+  backup_retention_period = 7
+
+  # Development environment can be destroyed and recreated.
+  deletion_protection = false
+  skip_final_snapshot = true
+
+  # Apply infrastructure changes during the normal maintenance window where
+  # possible.
+  apply_immediately = false
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+# ==============================================================================
+# ECS FARGATE MODULE
+# ==============================================================================
+# Deploys the LaunchPad API as a stateless ECS Fargate service.
+#
+# Tasks run in private application subnets and do not receive public IP
+# addresses.
+#
+# The service will later be connected to the Application Load Balancer through
+# the target group ARN.
+# ==============================================================================
+
+module "ecs" {
+  source = "../../modules/ecs"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  # --------------------------------------------------------------------------
+  # CONTAINER
+  # --------------------------------------------------------------------------
+
+  container_name = "launchpad-api"
+
+  # For the first manual deployment, this will be the image pushed to ECR.
+  #
+  # We will later replace the tag with an immutable image reference generated
+  # by GitHub Actions.
+  container_image = "${module.ecr.repository_url}:latest"
+
+  container_port = 3000
+
+  node_environment = "production"
+
+  # --------------------------------------------------------------------------
+  # COMPUTE
+  # --------------------------------------------------------------------------
+
+  task_cpu    = 256
+  task_memory = 512
+
+  # Start with one task in dev to control Fargate costs.
+  desired_count = 1
+
+  # --------------------------------------------------------------------------
+  # NETWORKING
+  # --------------------------------------------------------------------------
+
+  private_app_subnet_ids = module.vpc.private_app_subnet_ids
+
+  ecs_security_group_id = module.security_groups.ecs_security_group_id
+
+  # --------------------------------------------------------------------------
+  # IAM
+  # --------------------------------------------------------------------------
+
+  execution_role_arn = module.iam.ecs_execution_role_arn
+
+  task_role_arn = module.iam.ecs_task_role_arn
+
+  # --------------------------------------------------------------------------
+  # CLOUDWATCH
+  # --------------------------------------------------------------------------
+
+  log_group_name = module.cloudwatch.log_group_name
+
+  # --------------------------------------------------------------------------
+  # DATABASE SECRET
+  # --------------------------------------------------------------------------
+
+  database_secret_arn = module.rds.master_user_secret_arn
+
+  # --------------------------------------------------------------------------
+  # LOAD BALANCER
+  # --------------------------------------------------------------------------
+  # Leave this null for the moment.
+  #
+  # Once we create the ALB module, we will pass:
+  #
+  # module.alb.target_group_arn
+  #
+  # into this variable.
+  target_group_arn = null
 
   tags = {
     Project     = var.project_name

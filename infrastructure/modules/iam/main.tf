@@ -143,6 +143,20 @@ resource "aws_iam_role_policy" "ecs_execution" {
         # The :* suffix covers the log streams created under this log group.
         Resource = "${var.cloudwatch_log_group_arn}:*"
         # Ends the third statement block.
+      },
+      # Statement 4: Read secrets from Secret Manager
+      # Starts the fourth statement block.
+      {
+        # Identifies this statement as Reading Secret from Secret Manager
+        Sid    = "ReadDatabaseSecret"
+        Effect = "Allow"
+
+        # List the actions need to retrieve secret from Secret Manager.
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+
+        Resource = var.database_secret_arn
       }
       # Ends the list of policy statements.
     ]

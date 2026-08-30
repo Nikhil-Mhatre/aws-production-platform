@@ -17,3 +17,8 @@ variable "cloudwatch_log_group_arn" {
   description = "ARN of the CloudWatch Log Group used by ECS"
   type        = string
 }
+
+variable "database_secret_arn" {
+  description = "ARN of the Secrets Manager secret containing RDS credentials"
+  type        = string
+}

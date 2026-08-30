@@ -102,3 +102,32 @@ output "ecs_log_group_arn" {
   description = "ARN of the CloudWatch Log Group used by ECS"
   value       = module.cloudwatch.log_group_arn
 }
+
+# ==============================================================================
+# RDS OUTPUTS
+# ==============================================================================
+
+output "rds_instance_endpoint" {
+  description = "RDS PostgreSQL endpoint"
+  value       = module.rds.db_instance_endpoint
+}
+
+output "rds_instance_address" {
+  description = "RDS PostgreSQL hostname"
+  value       = module.rds.db_instance_address
+}
+
+output "rds_instance_port" {
+  description = "RDS PostgreSQL port"
+  value       = module.rds.db_instance_port
+}
+
+output "rds_database_name" {
+  description = "LaunchPad PostgreSQL database name"
+  value       = module.rds.database_name
+}
+
+output "rds_master_user_secret_arn" {
+  description = "Secrets Manager ARN containing the RDS master credentials"
+  value       = module.rds.master_user_secret_arn
+}
