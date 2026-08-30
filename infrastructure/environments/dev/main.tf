@@ -281,6 +281,9 @@ module "iam" {
   # The execution role can therefore be restricted to pulling images from
   # this specific ECR repository instead of granting unrestricted ECR access.
   ecr_repository_arn = module.ecr.repository_arn
+
+  # Restrict CloudWatch Logs access to this project's ECS log group.
+  cloudwatch_log_group_arn = module.cloudwatch.log_group_arn
 }
 
 
@@ -322,6 +325,30 @@ module "vpc_endpoints" {
 
   # Only ECS tasks are allowed to connect to the interface endpoints.
   ecs_security_group_id = module.security_groups.ecs_security_group_id
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+# ==============================================================================
+# CLOUDWATCH MODULE
+# ==============================================================================
+# Creates the CloudWatch Log Group used by ECS Fargate for LaunchPad API
+# container logs.
+#
+# The log group ARN is also passed to the IAM module so that the ECS execution
+# role can be restricted to this specific log destination.
+# ==============================================================================
+
+module "cloudwatch" {
+  source = "../../modules/cloudwatch"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  log_retention_days = var.log_retention_days
 
   tags = {
     Project     = var.project_name

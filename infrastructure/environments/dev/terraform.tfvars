@@ -3,3 +3,4 @@ project_name       = "aws-production-platform"
 environment        = "dev"
 vpc_cidr           = "10.0.0.0/16"
 enable_nat_gateway = true
+log_retention_days  = 1

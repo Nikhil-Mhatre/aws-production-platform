@@ -92,3 +92,13 @@ output "secrets_manager_endpoint_id" {
   description = "Secrets Manager VPC endpoint ID"
   value       = module.vpc_endpoints.secrets_manager_endpoint_id
 }
+
+output "ecs_log_group_name" {
+  description = "CloudWatch Log Group used by ECS"
+  value       = module.cloudwatch.log_group_name
+}
+
+output "ecs_log_group_arn" {
+  description = "ARN of the CloudWatch Log Group used by ECS"
+  value       = module.cloudwatch.log_group_arn
+}
