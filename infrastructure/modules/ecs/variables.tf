@@ -124,6 +124,16 @@ variable "database_secret_arn" {
   sensitive   = true
 }
 
+variable "database_host" {
+  description = "Hostname of the RDS PostgreSQL instance"
+  type        = string
+}
+
+variable "database_name" {
+  description = "Name of the PostgreSQL database"
+  type        = string
+}
+
 
 # ==============================================================================
 # LOAD BALANCER

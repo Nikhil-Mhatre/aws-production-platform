@@ -487,17 +487,45 @@ module "ecs" {
 
   database_secret_arn = module.rds.master_user_secret_arn
 
-  # --------------------------------------------------------------------------
-  # LOAD BALANCER
-  # --------------------------------------------------------------------------
-  # Leave this null for the moment.
-  #
-  # Once we create the ALB module, we will pass:
-  #
-  # module.alb.target_group_arn
-  #
-  # into this variable.
-  target_group_arn = null
+  database_host = module.rds.db_instance_address
+
+  database_name = module.rds.database_name
+
+  # Register ECS tasks with the ALB target group.
+  target_group_arn = module.alb.target_group_arn
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+# ==============================================================================
+# APPLICATION LOAD BALANCER
+# ==============================================================================
+# The ALB provides the public entry point for LaunchPad API.
+#
+# It is placed in public subnets across multiple Availability Zones.
+#
+# Traffic is forwarded to ECS Fargate tasks in private application subnets.
+# ==============================================================================
+
+module "alb" {
+  source = "../../modules/alb"
+  vpc_id = module.vpc.vpc_id
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  # ALB is placed in public subnets across the two Availability Zones.
+  public_subnet_ids = module.vpc.public_subnet_ids
+
+  # Only the ALB security group is attached to the load balancer.
+  alb_security_group_id = module.security_groups.alb_security_group_id
+
+  # LaunchPad API listens on port 3000.
+  target_port = 3000
 
   tags = {
     Project     = var.project_name

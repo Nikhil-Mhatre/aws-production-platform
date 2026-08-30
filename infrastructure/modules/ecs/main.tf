@@ -78,20 +78,24 @@ resource "aws_ecs_task_definition" "this" {
         {
           name  = "PORT"
           value = tostring(var.container_port)
+        },
+
+        {
+          name  = "DB_HOST"
+          value = var.database_host
+        },
+
+        {
+          name  = "DB_NAME"
+          value = var.database_name
+        },
+        {
+          name  = "DB_SSL"
+          value = "true"
         }
       ]
 
       secrets = [
-        {
-          name      = "DB_HOST"
-          valueFrom = "${var.database_secret_arn}:host::"
-        },
-
-        {
-          name      = "DB_NAME"
-          valueFrom = "${var.database_secret_arn}:dbname::"
-        },
-
         {
           name      = "DB_USER"
           valueFrom = "${var.database_secret_arn}:username::"

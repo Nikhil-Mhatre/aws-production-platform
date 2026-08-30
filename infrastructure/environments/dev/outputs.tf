@@ -131,3 +131,17 @@ output "rds_master_user_secret_arn" {
   description = "Secrets Manager ARN containing the RDS master credentials"
   value       = module.rds.master_user_secret_arn
 }
+
+# ==============================================================================
+# ALB OUTPUTS
+# ==============================================================================
+
+output "alb_dns_name" {
+  description = "DNS name of the Application Load Balancer"
+  value       = module.alb.load_balancer_dns_name
+}
+
+output "alb_target_group_arn" {
+  description = "ARN of the ALB target group"
+  value       = module.alb.target_group_arn
+}

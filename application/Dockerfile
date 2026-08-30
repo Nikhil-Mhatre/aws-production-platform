@@ -13,6 +13,8 @@ RUN pnpm install --prod --frozen-lockfile
 
 # Copy application source
 COPY src ./src
+COPY migrations ./migrations
+COPY scripts ./scripts
 
 # Run the application as the non-root node user
 USER node
